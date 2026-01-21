@@ -4,10 +4,6 @@ body {
   text-align: center;
 }
 
-h1 {
-  margin-top: 10px;
-}
-
 #board {
   display: grid;
   grid-template-columns: repeat(9, 60px);
@@ -30,10 +26,8 @@ h1 {
   background: #f9f3dc;
   border: 2px solid #000;
   clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
-  font-size: 26px;
-  line-height: 54px;
+  font-size: 24px;
   cursor: pointer;
-  user-select: none;
 }
 
 .enemy {
@@ -44,6 +38,8 @@ h1 {
   color: red;
 }
 
-#status {
-  font-size: 18px;
+#captured {
+  display: flex;
+  justify-content: space-around;
 }
+
