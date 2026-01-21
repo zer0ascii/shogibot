@@ -3,9 +3,9 @@ const statusText = document.getElementById("status");
 const handPlayer = document.getElementById("hand-player");
 const handBot = document.getElementById("hand-bot");
 
-const moveSound = new Audio("sounds/move.wav");
-const errorSound = new Audio("sounds/error.wav");
-const captureSound = new Audio("sounds/capture.wav");
+const moveSound = new Audio("sounds/move.mp3");
+const errorSound = new Audio("sounds/illegal.mp3");
+const captureSound = new Audio("sounds/capture.mp3");
 
 const KANJI = {
   FU:"歩", KY:"香", KE:"桂", GI:"銀", KI:"金",
@@ -85,7 +85,24 @@ function clickSquare(i){
     illegal(); selected=null; return;
   }
 
-  doMove(selected,i,"player");
+  doMove(function doMove(f,t,who){
+  if(state[t] && state[t].type==="OU"){
+    if(state[t].owner==="bot") winGame();
+    else loseGame();
+  }
+
+  if(state[t]){
+    captureSound.play();
+    hands[who].push(demote(state[t].type));
+  } else {
+    moveSound.play();
+  }
+
+  state[t]=state[f];
+  state[f]=null;
+  promoteIfPossible(t);
+}
+);
   selected=null;
   endPlayerTurn();
 }
