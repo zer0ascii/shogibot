@@ -113,3 +113,52 @@ h1 {
   font-size: 18px;
   letter-spacing: 2px;
 }
+/* ===== Gewinn / Verlust Overlay ===== */
+#overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 10, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+#overlay.hidden {
+  display: none;
+}
+
+#result-text {
+  font-size: 64px;
+  letter-spacing: 8px;
+  animation: fadeIn 1.2s ease forwards;
+}
+
+/* Gewinn */
+.win {
+  color: gold;
+  text-shadow:
+    0 0 10px gold,
+    0 0 25px orange;
+}
+
+/* Verlust */
+.lose {
+  color: #b00000;
+  text-shadow:
+    0 0 10px #600,
+    0 0 30px black;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
