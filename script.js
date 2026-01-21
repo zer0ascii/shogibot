@@ -3,9 +3,9 @@ const statusText = document.getElementById("status");
 const handPlayer = document.getElementById("hand-player");
 const handBot = document.getElementById("hand-bot");
 
-const moveSound = new Audio("sounds/move.mp3");
-const errorSound = new Audio("sounds/illegal.mp3");
-const captureSound = new Audio("sounds/capture.mp3");
+const moveSound = new Audio("sounds/move.wav");
+const errorSound = new Audio("sounds/error.wav");
+const captureSound = new Audio("sounds/capture.wav");
 
 const KANJI = {
   FU:"歩", KY:"香", KE:"桂", GI:"銀", KI:"金",
@@ -13,18 +13,20 @@ const KANJI = {
   TO:"と", NY:"杏", NK:"圭", NG:"全", UM:"馬", RY:"龍"
 };
 
-let turn = "player";
-let selected = null;
-let selectedHand = null;
-
-let state = Array(81).fill(null);
-
-let hands = {
-  player: [],
-  bot: []
+const VALUE = {
+  FU:1, KY:3, KE:3, GI:4, KI:5,
+  KA:8, HI:9, OU:100,
+  TO:5, NY:5, NK:5, NG:5, UM:10, RY:11
 };
 
-// --- Startposition ---
+let turn="player";
+let selected=null;
+let selectedHand=null;
+
+let state=Array(81).fill(null);
+let hands={player:[],bot:[]};
+
+/* ===== Startposition ===== */
 function put(i,t,o){state[i]={type:t,owner:o};}
 
 for(let i=0;i<9;i++){ put(18+i,"FU","bot"); put(54+i,"FU","player"); }
@@ -40,7 +42,7 @@ put(4,"OU","bot"); put(76,"OU","player");
 put(16,"KA","bot"); put(64,"KA","player");
 put(10,"HI","bot"); put(70,"HI","player");
 
-// --- Board erstellen ---
+/* ===== Board ===== */
 for(let i=0;i<81;i++){
   const s=document.createElement("div");
   s.className="square";
@@ -49,6 +51,7 @@ for(let i=0;i<81;i++){
 }
 render();
 
+/* ===== Render ===== */
 function render(){
   document.querySelectorAll(".square").forEach((s,i)=>{
     s.innerHTML="";
@@ -66,49 +69,107 @@ function render(){
   handBot.textContent=hands.bot.map(p=>KANJI[p]).join(" ");
 }
 
+/* ===== Player ===== */
 function clickSquare(i){
   if(turn!=="player")return;
 
-  if(selectedHand){
-    if(!state[i]){
-      state[i]={type:selectedHand,owner:"player"};
-      hands.player.splice(hands.player.indexOf(selectedHand),1);
-      selectedHand=null;
-      moveSound.play();
-      endTurn();
-    }
-    return;
-  }
-
   const p=state[i];
+
   if(selected===null){
     if(p && p.owner==="player") selected=i;
     else illegal();
-  }else{
-    if(!legalMove(selected,i)){ illegal(); selected=null; return; }
-    doMove(selected,i);
-    selected=null;
-    endTurn();
+    return;
   }
+
+  if(!legalMove(selected,i)){
+    illegal(); selected=null; return;
+  }
+
+  doMove(selected,i,"player");
+  selected=null;
+  endPlayerTurn();
 }
 
-function endTurn(){
+function endPlayerTurn(){
   render();
   turn="bot";
-  statusText.textContent="ボット ノ ターン";
-  setTimeout(botMove,600);
+  thinking();
+  setTimeout(botMove,1000);
 }
 
-function illegal(){
-  errorSound.play();
-  statusText.textContent="イリーガル ナ ムーブ";
+/* ===== Bot Thinking ===== */
+let dots=0;
+function thinking(){
+  statusText.textContent="考え中";
+  dots=0;
+  botThinkInterval=setInterval(()=>{
+    dots=(dots+1)%4;
+    statusText.textContent="考え中" + "・".repeat(dots);
+  },300);
 }
 
-function doMove(f,t){
+/* ===== Bot ===== */
+function botMove(){
+  clearInterval(botThinkInterval);
+
+  let bestScore=-9999;
+  let bestMove=null;
+
+  for(let i=0;i<81;i++){
+    const p=state[i];
+    if(p && p.owner==="bot"){
+      for(let t=0;t<81;t++){
+        if(!legalMove(i,t))continue;
+
+        const backupFrom=state[i];
+        const backupTo=state[t];
+
+        let gain=0;
+        if(state[t]) gain=VALUE[state[t].type];
+
+        state[t]=state[i];
+        state[i]=null;
+
+        const score=gain + evaluateBoard();
+
+        state[i]=backupFrom;
+        state[t]=backupTo;
+
+        if(score>bestScore){
+          bestScore=score;
+          bestMove=[i,t];
+        }
+      }
+    }
+  }
+
+  if(bestMove){
+    doMove(bestMove[0],bestMove[1],"bot");
+  }
+
+  turn="player";
+  statusText.textContent="プレイヤー ノ ターン";
+  render();
+}
+
+/* ===== Bewertung ===== */
+function evaluateBoard(){
+  let score=0;
+  state.forEach(p=>{
+    if(!p)return;
+    const v=VALUE[p.type];
+    score += p.owner==="bot" ? v : -v;
+  });
+  return score;
+}
+
+/* ===== Moves ===== */
+function doMove(f,t,who){
   if(state[t]){
     captureSound.play();
-    hands.player.push(demote(state[t].type));
+    hands[who].push(demote(state[t].type));
   }else moveSound.play();
+
   state[t]=state[f];
   state[f]=null;
   promoteIfPossible(t);
@@ -121,17 +182,19 @@ function demote(t){
 function promoteIfPossible(i){
   const p=state[i];
   if(["FU","KY","KE","GI","KA","HI"].includes(p.type)){
-    if((p.owner==="player" && i<27)||(p.owner==="bot"&&i>53)){
+    if((p.owner==="player"&&i<27)||(p.owner==="bot"&&i>53)){
       p.type={FU:"TO",KY:"NY",KE:"NK",GI:"NG",KA:"UM",HI:"RY"}[p.type];
       p.promoted=true;
     }
   }
 }
 
+/* ===== Regeln ===== */
 function legalMove(f,t){
   const p=state[f];
   if(state[t] && state[t].owner===p.owner)return false;
-  const dx=(t%9)-(f%9), dy=Math.floor(t/9)-Math.floor(f/9);
+  const dx=(t%9)-(f%9);
+  const dy=Math.floor(t/9)-Math.floor(f/9);
   const dir=p.owner==="player"?-1:1;
 
   switch(p.type){
@@ -151,23 +214,7 @@ function legalMove(f,t){
   return false;
 }
 
-function botMove(){
-  let moves=[];
-  for(let i=0;i<81;i++){
-    const p=state[i];
-    if(p&&p.owner==="bot"){
-      for(let t=0;t<81;t++){
-        if(legalMove(i,t)) moves.push([i,t]);
-      }
-    }
-  }
-  if(moves.length){
-    const [f,t]=moves[Math.floor(Math.random()*moves.length)];
-    if(state[t])hands.bot.push(demote(state[t].type));
-    state[t]=state[f]; state[f]=null;
-    promoteIfPossible(t);
-  }
-  turn="player";
-  statusText.textContent="プレイヤー ノ ターン";
-  render();
+function illegal(){
+  errorSound.play();
+  statusText.textContent="イリーガル ナ ムーブ";
 }
