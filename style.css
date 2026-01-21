@@ -4,6 +4,10 @@ body {
   text-align: center;
 }
 
+h1 {
+  margin-top: 10px;
+}
+
 #board {
   display: grid;
   grid-template-columns: repeat(9, 60px);
@@ -26,11 +30,20 @@ body {
   background: #f9f3dc;
   border: 2px solid #000;
   clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
-  font-size: 24px;
+  font-size: 26px;
   line-height: 54px;
   cursor: pointer;
+  user-select: none;
+}
+
+.enemy {
+  transform: rotate(180deg);
 }
 
 .promoted {
   color: red;
+}
+
+#status {
+  font-size: 18px;
 }
