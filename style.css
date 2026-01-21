@@ -1,45 +1,115 @@
+/* ===== Allgemein ===== */
 body {
-  background: #f2e2c4;
-  font-family: "Hiragino Mincho Pro", serif;
+  margin: 0;
+  padding: 0;
   text-align: center;
+  font-family: "Noto Serif JP", serif;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      #f5f1e6,
+      #f5f1e6 10px,
+      #f0ebdd 10px,
+      #f0ebdd 20px
+    );
 }
 
+/* ===== Titel ===== */
+h1 {
+  margin: 15px 0;
+  font-size: 36px;
+  letter-spacing: 4px;
+}
+
+/* ===== Captured Pieces ===== */
+#captured {
+  display: flex;
+  justify-content: space-around;
+  margin: 10px auto;
+  width: 600px;
+  font-size: 16px;
+}
+
+#hand-player, #hand-bot {
+  display: inline-block;
+  margin-top: 5px;
+  font-size: 22px;
+}
+
+/* ===== Board Rahmen ===== */
+#board-wrapper {
+  display: inline-block;
+  padding: 18px;
+  background: linear-gradient(135deg, #caa76b, #b28a4a);
+  box-shadow:
+    inset 0 0 15px rgba(0,0,0,0.4),
+    0 12px 25px rgba(0,0,0,0.6);
+}
+
+/* ===== Board ===== */
 #board {
   display: grid;
   grid-template-columns: repeat(9, 60px);
   grid-template-rows: repeat(9, 60px);
-  margin: 20px auto;
-  background: #d1a15a;
-  border: 6px solid #8b5a2b;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      #ddb979,
+      #ddb979 2px,
+      #d3ab6b 2px,
+      #d3ab6b 60px
+    );
 }
 
+/* ===== Squares ===== */
 .square {
-  border: 1px solid #8b5a2b;
+  border: 1px solid rgba(80, 50, 20, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+/* ===== Shogi Stein ===== */
 .piece {
   width: 48px;
-  height: 54px;
-  background: #f9f3dc;
-  border: 2px solid #000;
+  height: 56px;
+  background: linear-gradient(to bottom, #fff8e6, #e6d8b8);
   clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
-  font-size: 24px;
+  border: 1px solid #3a2a12;
+  font-size: 26px;
+  line-height: 56px;
   cursor: pointer;
+  user-select: none;
+
+  box-shadow:
+    0 3px 4px rgba(0,0,0,0.6),
+    inset 0 -2px 2px rgba(0,0,0,0.2);
+
+  transition: transform 0.1s, box-shadow 0.1s;
 }
 
+/* Hover = Stein hebt sich */
+.piece:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 6px 8px rgba(0,0,0,0.7),
+    inset 0 -2px 2px rgba(0,0,0,0.2);
+}
+
+/* Gegner */
 .enemy {
   transform: rotate(180deg);
 }
 
+/* Befördert */
 .promoted {
-  color: red;
+  color: #b00000;
+  background: linear-gradient(to bottom, #fff0f0, #e6c0c0);
 }
 
-#captured {
-  display: flex;
-  justify-content: space-around;
+/* ===== Status ===== */
+#status {
+  margin: 15px;
+  font-size: 18px;
+  letter-spacing: 2px;
 }
-
