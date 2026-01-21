@@ -1,0 +1,36 @@
+body {
+  background: #f2e2c4;
+  font-family: "Hiragino Mincho Pro", serif;
+  text-align: center;
+}
+
+#board {
+  display: grid;
+  grid-template-columns: repeat(9, 60px);
+  grid-template-rows: repeat(9, 60px);
+  margin: 20px auto;
+  background: #d1a15a;
+  border: 6px solid #8b5a2b;
+}
+
+.square {
+  border: 1px solid #8b5a2b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.piece {
+  width: 48px;
+  height: 54px;
+  background: #f9f3dc;
+  border: 2px solid #000;
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  font-size: 24px;
+  line-height: 54px;
+  cursor: pointer;
+}
+
+.promoted {
+  color: red;
+}
