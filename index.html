@@ -3,18 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <title>ショウギ・ボット</title>
+
+<!-- Japanische Schrift -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@600&display=swap" rel="stylesheet">
+
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>ショウギ・ボット</h1>
+<h1>将棋・ボット</h1>
 
 <div id="captured">
-  <div>プレイヤー モチゴマ: <span id="hand-player"></span></div>
-  <div>ボット モチゴマ: <span id="hand-bot"></span></div>
+  <div>プレイヤー モチゴマ<br><span id="hand-player"></span></div>
+  <div>ボット モチゴマ<br><span id="hand-bot"></span></div>
 </div>
 
-<div id="board"></div>
+<div id="board-wrapper">
+  <div id="board"></div>
+</div>
 
 <p id="status">プレイヤー ノ ターン</p>
 
